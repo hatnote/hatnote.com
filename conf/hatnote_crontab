@@ -1,0 +1,105 @@
+# Edit this file to introduce tasks to be run by cron.
+# 
+# Each task to run has to be defined through a single line
+# indicating with different fields when the task will be run
+# and what command to run for the task
+# 
+# To define the time you can provide concrete values for
+# minute (m), hour (h), day of month (dom), month (mon),
+# and day of week (dow) or use '*' in these fields (for 'any').# 
+# Notice that tasks will be started based on the cron's system
+# daemon's notion of time and timezones.
+# 
+# Output of the crontab jobs (including errors) is sent through
+# email to the user the crontab file belongs to (unless redirected).
+# 
+# For example, you can run a backup of all your user accounts
+# at 5 a.m every week with:
+# 0 5 * * 1 tar -zcf /var/backups/home.tgz /home/
+# 
+# For more information see the manual pages of crontab(5) and cron(8)
+# 
+# m h  dom mon dow   command
+
+# Weeklypedia constants
+PYTHON_BIN=/home/hatnote/virtualenvs/weeklypedia/bin/python
+FETCH_SCRIPT=/home/hatnote/weeklypedia/weeklypedia/fetch.py
+PUBLISH_SCRIPT=/home/hatnote/weeklypedia/weeklypedia/publish.py
+CRON_RSS_PATH = /home/hatnote/weeklypedia/static/cron.rss
+HATNOTE_MAIL_PATH = /var/mail/hatnote
+LOG_BASE_PATH=/home/hatnote/weeklypedia/logs/cron_out
+
+# first, monitoring with cronfed, every 15 minutes
+*/15 * * * *  $PYTHON_BIN -m cronfed --link http://hatnote.com --output $CRON_RSS_PATH $HATNOTE_MAIL_PATH 2>&1 | tee -a $LOG_BASE_PATH/cronfed.txt
+
+# now, hourly Weeklypedia data fetches
+0 * * * *  $PYTHON_BIN $FETCH_SCRIPT --lang ko 2>&1 | tee -a $LOG_BASE_PATH/ko.txt
+1 * * * *  $PYTHON_BIN $FETCH_SCRIPT --lang en 2>&1 | tee -a $LOG_BASE_PATH/en.txt
+3 * * * *  $PYTHON_BIN $FETCH_SCRIPT --lang de 2>&1 | tee -a $LOG_BASE_PATH/de.txt
+5 * * * *  $PYTHON_BIN $FETCH_SCRIPT --lang fr 2>&1 | tee -a $LOG_BASE_PATH/fr.txt
+7 * * * *  $PYTHON_BIN $FETCH_SCRIPT --lang et 2>&1 | tee -a $LOG_BASE_PATH/et.txt
+8 * * * *  $PYTHON_BIN $FETCH_SCRIPT --lang sv 2>&1 | tee -a $LOG_BASE_PATH/sv.txt
+9 * * * *  $PYTHON_BIN $FETCH_SCRIPT --lang da 2>&1 | tee -a $LOG_BASE_PATH/da.txt
+10 * * * *  $PYTHON_BIN $FETCH_SCRIPT --lang it 2>&1 | tee -a $LOG_BASE_PATH/it.txt
+11 * * * *  $PYTHON_BIN $FETCH_SCRIPT --lang ca 2>&1 | tee -a $LOG_BASE_PATH/ca.txt
+12 * * * *  $PYTHON_BIN $FETCH_SCRIPT --lang es 2>&1 | tee -a $LOG_BASE_PATH/es.txt
+13 * * * *  $PYTHON_BIN $FETCH_SCRIPT --lang fa 2>&1 | tee -a $LOG_BASE_PATH/fa.txt
+14 * * * *  $PYTHON_BIN $FETCH_SCRIPT --lang zh 2>&1 | tee -a $LOG_BASE_PATH/zh.txt
+15 * * * *  $PYTHON_BIN $FETCH_SCRIPT --lang ur 2>&1 | tee -a $LOG_BASE_PATH/ur.txt
+16 * * * *  $PYTHON_BIN $FETCH_SCRIPT --lang kn 2>&1 | tee -a $LOG_BASE_PATH/kn.txt
+
+# daily Weeklypedia data backups
+# TODO: maybe make this every other day or something?
+30 8 * * * /home/hatnote/weeklypedia/static/repo_update.sh
+
+
+# developer preview Thursday at 8:30pm Eastern
+20 20 * * 4 $PYTHON_BIN $PUBLISH_SCRIPT --lang en --debug
+23 20 * * 4 $PYTHON_BIN $PUBLISH_SCRIPT --lang kn --debug
+
+# production jobs go out on Friday morning (TODO: localize)
+# These are arbitrarily spaced out by a couple minutes just to be safe
+20 6 * * 5 $PYTHON_BIN $PUBLISH_SCRIPT --lang ko 2>&1 | tee -a $LOG_BASE_PATH/ko.txt
+20 6 * * 5 $PYTHON_BIN $PUBLISH_SCRIPT --lang en 2>&1 | tee -a $LOG_BASE_PATH/en.txt
+20 6 * * 5 $PYTHON_BIN $PUBLISH_SCRIPT --lang de 2>&1 | tee -a $LOG_BASE_PATH/de.txt
+20 6 * * 5 $PYTHON_BIN $PUBLISH_SCRIPT --lang fr 2>&1 | tee -a $LOG_BASE_PATH/fr.txt
+21 6 * * 5 $PYTHON_BIN $PUBLISH_SCRIPT --lang et 2>&1 | tee -a $LOG_BASE_PATH/et.txt
+21 6 * * 5 $PYTHON_BIN $PUBLISH_SCRIPT --lang sv 2>&1 | tee -a $LOG_BASE_PATH/sv.txt
+21 6 * * 5 $PYTHON_BIN $PUBLISH_SCRIPT --lang da 2>&1 | tee -a $LOG_BASE_PATH/da.txt
+21 6 * * 5 $PYTHON_BIN $PUBLISH_SCRIPT --lang it 2>&1 | tee -a $LOG_BASE_PATH/it.txt
+22 6 * * 5 $PYTHON_BIN $PUBLISH_SCRIPT --lang ca 2>&1 | tee -a $LOG_BASE_PATH/ca.txt
+22 6 * * 5 $PYTHON_BIN $PUBLISH_SCRIPT --lang es 2>&1 | tee -a $LOG_BASE_PATH/es.txt
+22 6 * * 5 $PYTHON_BIN $PUBLISH_SCRIPT --lang fa 2>&1 | tee -a $LOG_BASE_PATH/fa.txt
+22 6 * * 5 $PYTHON_BIN $PUBLISH_SCRIPT --lang zh 2>&1 | tee -a $LOG_BASE_PATH/zh.txt
+23 6 * * 5 $PYTHON_BIN $PUBLISH_SCRIPT --lang ur 2>&1 | tee -a $LOG_BASE_PATH/ur.txt
+23 6 * * 5 $PYTHON_BIN $PUBLISH_SCRIPT --lang kn 2>&1 | tee -a $LOG_BASE_PATH/kn.txt
+
+#### Wikimon GeoIP update
+# Wikimon GeoIP update constants
+GEOIP_UPDATE_SCRIPT=/home/hatnote/wikimon/update_geodb.sh
+GEOIP_UPDATE_LOG=/home/hatnote/wikimon/logs/geodb_update.log
+GEODB_DIR=/home/hatnote/wikimon/geodb/
+
+0 12 * * 3 env GEODB_DIR=$GEODB_DIR $GEOIP_UPDATE_SCRIPT 2>&1 | tee -a $GEOIP_UPDATE_LOG
+
+
+#### top.hatnote.com fetch and render
+
+TOP_PYTHON_BIN=/home/hatnote/virtualenvs/top/bin/python
+TOP_PYTHON_SCRIPT=/home/hatnote/top/top/get_data.py
+TOP_LOG_BASE_PATH=/home/hatnote/top/logs/cron_out
+
+00 20 * * * $TOP_PYTHON_BIN $TOP_PYTHON_SCRIPT --update --lang ko --project wikipedia | tee -a $TOP_LOG_BASE_PATH/ko.txt
+00 20 * * * $TOP_PYTHON_BIN $TOP_PYTHON_SCRIPT --update --lang en --project wikipedia | tee -a $TOP_LOG_BASE_PATH/en.txt
+00 20 * * * $TOP_PYTHON_BIN $TOP_PYTHON_SCRIPT --update --lang de --project wikipedia | tee -a $TOP_LOG_BASE_PATH/de.txt
+00 20 * * * $TOP_PYTHON_BIN $TOP_PYTHON_SCRIPT --update --lang fr --project wikipedia | tee -a $TOP_LOG_BASE_PATH/fr.txt
+00 20 * * * $TOP_PYTHON_BIN $TOP_PYTHON_SCRIPT --update --lang et --project wikipedia | tee -a $TOP_LOG_BASE_PATH/et.txt
+00 20 * * * $TOP_PYTHON_BIN $TOP_PYTHON_SCRIPT --update --lang sv --project wikipedia | tee -a $TOP_LOG_BASE_PATH/sv.txt
+01 20 * * * $TOP_PYTHON_BIN $TOP_PYTHON_SCRIPT --update --lang da --project wikipedia | tee -a $TOP_LOG_BASE_PATH/da.txt
+01 20 * * * $TOP_PYTHON_BIN $TOP_PYTHON_SCRIPT --update --lang it --project wikipedia | tee -a $TOP_LOG_BASE_PATH/it.txt
+01 20 * * * $TOP_PYTHON_BIN $TOP_PYTHON_SCRIPT --update --lang ca --project wikipedia | tee -a $TOP_LOG_BASE_PATH/ca.txt
+01 20 * * * $TOP_PYTHON_BIN $TOP_PYTHON_SCRIPT --update --lang es --project wikipedia | tee -a $TOP_LOG_BASE_PATH/es.txt
+# 01 20 * * * $TOP_PYTHON_BIN $TOP_PYTHON_SCRIPT --update --lang fa --project wikipedia  | tee -a $TOP_LOG_BASE_PATH/fa.txt
+01 20 * * * $TOP_PYTHON_BIN $TOP_PYTHON_SCRIPT --update --lang zh --project wikipedia | tee -a $TOP_LOG_BASE_PATH/zh.txt
+01 20 * * * $TOP_PYTHON_BIN $TOP_PYTHON_SCRIPT --update --lang ur --project wikipedia | tee -a $TOP_LOG_BASE_PATH/ur.txt
+01 20 * * * $TOP_PYTHON_BIN $TOP_PYTHON_SCRIPT --update --lang kn --project wikipedia | tee -a $TOP_LOG_BASE_PATH/kn.txt
