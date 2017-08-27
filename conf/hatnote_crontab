@@ -30,7 +30,7 @@ HATNOTE_MAIL_PATH = /var/mail/hatnote
 LOG_BASE_PATH=/home/hatnote/weeklypedia/logs/cron_out
 
 # first, monitoring with cronfed, every 15 minutes
-*/15 * * * *  $PYTHON_BIN -m cronfed --link http://hatnote.com --output $CRON_RSS_PATH $HATNOTE_MAIL_PATH 2>&1 | tee -a $LOG_BASE_PATH/cronfed.txt
+*/15 * * * *  $PYTHON_BIN -m cronfed --save 1024 --link http://hatnote.com --output $CRON_RSS_PATH $HATNOTE_MAIL_PATH 2>&1 | tee -a $LOG_BASE_PATH/cronfed.txt
 
 # now, hourly Weeklypedia data fetches
 0 * * * *  $PYTHON_BIN $FETCH_SCRIPT --lang ko 2>&1 | tee -a $LOG_BASE_PATH/ko.txt
@@ -47,6 +47,9 @@ LOG_BASE_PATH=/home/hatnote/weeklypedia/logs/cron_out
 14 * * * *  $PYTHON_BIN $FETCH_SCRIPT --lang zh 2>&1 | tee -a $LOG_BASE_PATH/zh.txt
 15 * * * *  $PYTHON_BIN $FETCH_SCRIPT --lang ur 2>&1 | tee -a $LOG_BASE_PATH/ur.txt
 16 * * * *  $PYTHON_BIN $FETCH_SCRIPT --lang kn 2>&1 | tee -a $LOG_BASE_PATH/kn.txt
+17 * * * *  $PYTHON_BIN $FETCH_SCRIPT --lang lv 2>&1 | tee -a $LOG_BASE_PATH/lv.txt
+18 * * * *  $PYTHON_BIN $FETCH_SCRIPT --lang el 2>&1 | tee -a $LOG_BASE_PATH/el.txt
+19 * * * *  $PYTHON_BIN $FETCH_SCRIPT --lang te 2>&1 | tee -a $LOG_BASE_PATH/te.txt
 
 # daily Weeklypedia data backups
 # TODO: maybe make this every other day or something?
@@ -55,7 +58,7 @@ LOG_BASE_PATH=/home/hatnote/weeklypedia/logs/cron_out
 
 # developer preview Thursday at 8:30pm Eastern
 20 20 * * 4 $PYTHON_BIN $PUBLISH_SCRIPT --lang en --debug
-23 20 * * 4 $PYTHON_BIN $PUBLISH_SCRIPT --lang kn --debug
+23 20 * * 4 $PYTHON_BIN $PUBLISH_SCRIPT --lang te --debug
 
 # production jobs go out on Friday morning (TODO: localize)
 # These are arbitrarily spaced out by a couple minutes just to be safe
@@ -73,6 +76,9 @@ LOG_BASE_PATH=/home/hatnote/weeklypedia/logs/cron_out
 22 6 * * 5 $PYTHON_BIN $PUBLISH_SCRIPT --lang zh 2>&1 | tee -a $LOG_BASE_PATH/zh.txt
 23 6 * * 5 $PYTHON_BIN $PUBLISH_SCRIPT --lang ur 2>&1 | tee -a $LOG_BASE_PATH/ur.txt
 23 6 * * 5 $PYTHON_BIN $PUBLISH_SCRIPT --lang kn 2>&1 | tee -a $LOG_BASE_PATH/kn.txt
+23 6 * * 5 $PYTHON_BIN $PUBLISH_SCRIPT --lang lv 2>&1 | tee -a $LOG_BASE_PATH/lv.txt
+23 6 * * 5 $PYTHON_BIN $PUBLISH_SCRIPT --lang el 2>&1 | tee -a $LOG_BASE_PATH/el.txt
+23 6 * * 5 $PYTHON_BIN $PUBLISH_SCRIPT --lang te 2>&1 | tee -a $LOG_BASE_PATH/te.txt
 
 #### Wikimon GeoIP update
 # Wikimon GeoIP update constants
@@ -88,11 +94,11 @@ GEODB_DIR=/home/hatnote/wikimon/geodb/
 TOP_PYTHON_BIN=/home/hatnote/virtualenvs/top/bin/python
 TOP_PYTHON_SCRIPT=/home/hatnote/top/top/get_data.py
 TOP_LOG_BASE_PATH=/home/hatnote/top/logs/cron_out
-TOP_POLL_TIME="20h"
+TOP_POLL_TIME="336h"
 TOP_POLL_INTERVAL="15m"
 
-01 21 * * * $TOP_PYTHON_BIN $TOP_PYTHON_SCRIPT --update --lang ko --project wikipedia --poll $TOP_POLL_TIME --poll-interval $TOP_POLL_INTERVAL 2>&1 | tee -a $TOP_LOG_BASE_PATH/ko.txt
-01 21 * * * $TOP_PYTHON_BIN $TOP_PYTHON_SCRIPT --update --lang en --project wikipedia --poll $TOP_POLL_TIME --poll-interval $TOP_POLL_INTERVAL 2>&1 | tee -a $TOP_LOG_BASE_PATH/en.txt
+00 21 * * * $TOP_PYTHON_BIN $TOP_PYTHON_SCRIPT --update --lang ko --project wikipedia --poll $TOP_POLL_TIME --poll-interval $TOP_POLL_INTERVAL 2>&1 | tee -a $TOP_LOG_BASE_PATH/ko.txt
+00 21 * * * $TOP_PYTHON_BIN $TOP_PYTHON_SCRIPT --update --lang en --project wikipedia --poll $TOP_POLL_TIME --poll-interval $TOP_POLL_INTERVAL 2>&1 | tee -a $TOP_LOG_BASE_PATH/en.txt
 01 21 * * * $TOP_PYTHON_BIN $TOP_PYTHON_SCRIPT --update --lang de --project wikipedia --poll $TOP_POLL_TIME --poll-interval $TOP_POLL_INTERVAL 2>&1 | tee -a $TOP_LOG_BASE_PATH/de.txt
 01 21 * * * $TOP_PYTHON_BIN $TOP_PYTHON_SCRIPT --update --lang fr --project wikipedia --poll $TOP_POLL_TIME --poll-interval $TOP_POLL_INTERVAL 2>&1 | tee -a $TOP_LOG_BASE_PATH/fr.txt
 01 21 * * * $TOP_PYTHON_BIN $TOP_PYTHON_SCRIPT --update --lang et --project wikipedia --poll $TOP_POLL_TIME --poll-interval $TOP_POLL_INTERVAL 2>&1 | tee -a $TOP_LOG_BASE_PATH/et.txt
@@ -102,11 +108,19 @@ TOP_POLL_INTERVAL="15m"
 02 21 * * * $TOP_PYTHON_BIN $TOP_PYTHON_SCRIPT --update --lang ca --project wikipedia --poll $TOP_POLL_TIME --poll-interval $TOP_POLL_INTERVAL 2>&1 | tee -a $TOP_LOG_BASE_PATH/ca.txt
 02 21 * * * $TOP_PYTHON_BIN $TOP_PYTHON_SCRIPT --update --lang es --project wikipedia --poll $TOP_POLL_TIME --poll-interval $TOP_POLL_INTERVAL 2>&1 | tee -a $TOP_LOG_BASE_PATH/es.txt
 # 01 20 * * * $TOP_PYTHON_BIN $TOP_PYTHON_SCRIPT --update --lang fa --project wikipedia --poll $TOP_POLL_TIME --poll-interval $TOP_POLL_INTERVAL 2>&1 | tee -a $TOP_LOG_BASE_PATH/fa.txt
-02 21 * * * $TOP_PYTHON_BIN $TOP_PYTHON_SCRIPT --update --lang zh --project wikipedia --poll $TOP_POLL_TIME --poll-interval $TOP_POLL_INTERVAL 2>&1 | tee -a $TOP_LOG_BASE_PATH/zh.txt
-02 21 * * * $TOP_PYTHON_BIN $TOP_PYTHON_SCRIPT --update --lang ur --project wikipedia --poll $TOP_POLL_TIME --poll-interval $TOP_POLL_INTERVAL 2>&1 | tee -a $TOP_LOG_BASE_PATH/ur.txt
-02 21 * * * $TOP_PYTHON_BIN $TOP_PYTHON_SCRIPT --update --lang kn --project wikipedia --poll $TOP_POLL_TIME --poll-interval $TOP_POLL_INTERVAL 2>&1 | tee -a $TOP_LOG_BASE_PATH/kn.txt
-02 21 * * * $TOP_PYTHON_BIN $TOP_PYTHON_SCRIPT --update --lang no --project wikipedia --poll $TOP_POLL_TIME --poll-interval $TOP_POLL_INTERVAL 2>&1 | tee -a $TOP_LOG_BASE_PATH/no.txt
-02 21 * * * $TOP_PYTHON_BIN $TOP_PYTHON_SCRIPT --update --lang bn --project wikipedia --poll $TOP_POLL_TIME --poll-interval $TOP_POLL_INTERVAL 2>&1 | tee -a $TOP_LOG_BASE_PATH/gn.txt
-02 21 * * * $TOP_PYTHON_BIN $TOP_PYTHON_SCRIPT --update --lang id --project wikipedia --poll $TOP_POLL_TIME --poll-interval $TOP_POLL_INTERVAL 2>&1 | tee -a $TOP_LOG_BASE_PATH/id.txt
-02 21 * * * $TOP_PYTHON_BIN $TOP_PYTHON_SCRIPT --update --lang ta --project wikipedia --poll $TOP_POLL_TIME --poll-interval $TOP_POLL_INTERVAL 2>&1 | tee -a $TOP_LOG_BASE_PATH/ta.txt
-02 21 * * * $TOP_PYTHON_BIN $TOP_PYTHON_SCRIPT --update --lang lv --project wikipedia --poll $TOP_POLL_TIME --poll-interval $TOP_POLL_INTERVAL 2>&1 | tee -a $TOP_LOG_BASE_PATH/lv.txt
+03 21 * * * $TOP_PYTHON_BIN $TOP_PYTHON_SCRIPT --update --lang zh --project wikipedia --poll $TOP_POLL_TIME --poll-interval $TOP_POLL_INTERVAL 2>&1 | tee -a $TOP_LOG_BASE_PATH/zh.txt
+03 21 * * * $TOP_PYTHON_BIN $TOP_PYTHON_SCRIPT --update --lang ur --project wikipedia --poll $TOP_POLL_TIME --poll-interval $TOP_POLL_INTERVAL 2>&1 | tee -a $TOP_LOG_BASE_PATH/ur.txt
+03 21 * * * $TOP_PYTHON_BIN $TOP_PYTHON_SCRIPT --update --lang kn --project wikipedia --poll $TOP_POLL_TIME --poll-interval $TOP_POLL_INTERVAL 2>&1 | tee -a $TOP_LOG_BASE_PATH/kn.txt
+03 21 * * * $TOP_PYTHON_BIN $TOP_PYTHON_SCRIPT --update --lang no --project wikipedia --poll $TOP_POLL_TIME --poll-interval $TOP_POLL_INTERVAL 2>&1 | tee -a $TOP_LOG_BASE_PATH/no.txt
+04 21 * * * $TOP_PYTHON_BIN $TOP_PYTHON_SCRIPT --update --lang bn --project wikipedia --poll $TOP_POLL_TIME --poll-interval $TOP_POLL_INTERVAL 2>&1 | tee -a $TOP_LOG_BASE_PATH/gn.txt
+04 21 * * * $TOP_PYTHON_BIN $TOP_PYTHON_SCRIPT --update --lang id --project wikipedia --poll $TOP_POLL_TIME --poll-interval $TOP_POLL_INTERVAL 2>&1 | tee -a $TOP_LOG_BASE_PATH/id.txt
+04 21 * * * $TOP_PYTHON_BIN $TOP_PYTHON_SCRIPT --update --lang ta --project wikipedia --poll $TOP_POLL_TIME --poll-interval $TOP_POLL_INTERVAL 2>&1 | tee -a $TOP_LOG_BASE_PATH/ta.txt
+04 21 * * * $TOP_PYTHON_BIN $TOP_PYTHON_SCRIPT --update --lang lv --project wikipedia --poll $TOP_POLL_TIME --poll-interval $TOP_POLL_INTERVAL 2>&1 | tee -a $TOP_LOG_BASE_PATH/lv.txt
+05 21 * * * $TOP_PYTHON_BIN $TOP_PYTHON_SCRIPT --update --lang el --project wikipedia --poll $TOP_POLL_TIME --poll-interval $TOP_POLL_INTERVAL 2>&1 | tee -a $TOP_LOG_BASE_PATH/el.txt
+05 21 * * * $TOP_PYTHON_BIN $TOP_PYTHON_SCRIPT --update --lang fa --project wikipedia --poll $TOP_POLL_TIME --poll-interval $TOP_POLL_INTERVAL 2>&1 | tee -a $TOP_LOG_BASE_PATH/fa.txt
+05 21 * * * $TOP_PYTHON_BIN $TOP_PYTHON_SCRIPT --update --lang cs --project wikipedia --poll $TOP_POLL_TIME --poll-interval $TOP_POLL_INTERVAL 2>&1 | tee -a $TOP_LOG_BASE_PATH/cs.txt
+05 21 * * * $TOP_PYTHON_BIN $TOP_PYTHON_SCRIPT --update --lang te --project wikipedia --poll $TOP_POLL_TIME --poll-interval $TOP_POLL_INTERVAL 2>&1 | tee -a $TOP_LOG_BASE_PATH/te.txt
+05 21 * * * $TOP_PYTHON_BIN $TOP_PYTHON_SCRIPT --update --lang pa --project wikipedia --poll $TOP_POLL_TIME --poll-interval $TOP_POLL_INTERVAL 2>&1 | tee -a $TOP_LOG_BASE_PATH/pa.txt
+06 21 * * * $TOP_PYTHON_BIN $TOP_PYTHON_SCRIPT --update --lang fi --project wikipedia --poll $TOP_POLL_TIME --poll-interval $TOP_POLL_INTERVAL 2>&1 | tee -a $TOP_LOG_BASE_PATH/fi.txt
+06 21 * * * $TOP_PYTHON_BIN $TOP_PYTHON_SCRIPT --update --lang or --project wikipedia --poll $TOP_POLL_TIME --poll-interval $TOP_POLL_INTERVAL 2>&1 | tee -a $TOP_LOG_BASE_PATH/or.txt
+06 21 * * * $TOP_PYTHON_BIN $TOP_PYTHON_SCRIPT --update --lang ar --project wikipedia --poll $TOP_POLL_TIME --poll-interval $TOP_POLL_INTERVAL 2>&1 | tee -a $TOP_LOG_BASE_PATH/ar.txt
